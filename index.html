@@ -1,23 +1,248 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  
+  <title>Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-{% block title %}{{ config.title }}{% if theme.index_with_subtitle and config.subtitle %} - {{config.subtitle }}{% endif %}{% endblock %}
+  
+  <meta property="og:site_name" content="Hexo"/>
 
-{% block page_class %}
-  {% if is_home() %}page-home{% endif -%}
-{% endblock %}
+  
+    <meta property="og:image" content=""/>
+  
 
-{% block content %}
-  <section id="posts" class="posts-expand">
-    {% for post in page.posts %}
-      {{ post_template.render(post, true) }}
-    {% endfor %}
-  </section>
+  <link rel="shortcut icon" href="/favicon.png">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
 
-  {% include '_partials/pagination.swig' %}
-{% endblock %}
+  <!--[if lt IE 9]><script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script><![endif]-->
+  
 
-{% block sidebar %}
-  {{ sidebar_template.render(false) }}
-{% endblock %}
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">Hexo</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/null">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper">
+  <article id="post-JavaReview-Exception" class="h-entry post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time class="dt-published" datetime="2021-08-31T12:40:39.000Z"><a href="/2021/08/31/JavaReview-Exception/">2021-08-31</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2021/08/31/JavaReview-Exception/">JavaReview-Exception</a></h1>
+  
+
+    </header>
+    <div class="e-content entry" itemprop="articleBody">
+      
+        <h1 id="java复习"><a href="#java复习" class="headerlink" title="java复习"></a>java复习</h1><h2 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h2><p><em><strong>1.异常分类</strong></em></p>
+<ul>
+<li><p>error：虚拟机无法解决的问题，如StackOverFlowError,OOM，一般不写针对性代码进行处理</p>
+<p>***疑问：jvm内存区域中各部分哪些会报StackOverFlowError，哪些会报OOM？</p>
+<p>答：jvm内存区域按照线程是否私有可以分两类：</p>
+<p>1.线程私有：程序计数器，虚拟机栈，本地方法栈</p>
+<p>​    线程共有：堆，方法区</p>
+<p>2.程序计数器（记录当前线程所执行到的字节码的行号）是所有内存区域中唯一没有OOM情况的内存区域</p>
+<p>3.栈只有出栈入栈操作，没有GC，但是只有栈（虚拟机栈和本地方法栈）可能会报stackOverFlowError,pc寄存器（程序计数器）也没有垃圾回收；堆和方法区都有GC；堆，栈，方法区都有可能溢出，都有可能OOM；</p>
+<p><img src="JavaReview-Exception.assets/u=3380235002,3184676905&fm=26&fmt=auto&gp=0-1630213795622.webp" alt="jvm内存模型"></p>
+</li>
+<li><p>Exception:一般是编程错误，可用针对性代码进行处理，Exception又可分为编译时异常和运行时异常：</p>
+<p>1.编译时异常：必须处理，程序员必须捕获或者声明所有的异常，否则可能发生严重错误eg:java.io.IOExeption,java.lang.ClassNotFoundException,java.lang.InterruptedException,java.io.FileNotFoundException,java.sql.SQLException</p>
+<p>2.运行时异常（ java.lang.RuntimeException）：不要求强制处理的异常，可以不做处理，但应该尽量避免</p>
+<p>​    eg:ArrayIndexOutOfBoundsException,NullPointerException,ClassCastException,ArithmeticException<br>,NumberFormatException,InputMismatchException</p>
+</li>
+</ul>
+<p><em><strong>2.异常处理机制</strong></em></p>
+<p>*注：1.一般在java中处理异常指的是处理Exception,程序员对Error一般是无能为力的</p>
+<p>​        2.java提供抓抛模型来优雅地处理异常：</p>
+<p>​         java程序在运行中发生异常，通常会生成一个异常类对象，并把这个对象提交给运行时的java系统，这叫抛异常。异常类对象可能是虚拟机自动生成的，也可能是开发人员自己创建的。</p>
+<p>​        如果一个方法抛出异常，则将该异常抛给该方法的调用者处理，若未处理，则继续抛给上层调用方法，直到异常被处理为止，若直到main函数还未被处理，则程序终止。该过程就是抓异常。（捕获异常）</p>
+<ul>
+<li><p>方式一：try-catch-finally（）</p>
+<p>try{<br>…… //可能产生异常的代码<br>}<br>catch( ExceptionName1 e ){<br>…… //当产生ExceptionName1型异常时的处置措施<br>}<br>catch( ExceptionName2 e ){<br>…… //当产生ExceptionName2型异常时的处置措施<br>}<br>[ finally{<br>…… //无论是否发生异常， 都无条件执行的语句（可写可不写，看功能吧）<br>} ]</p>
+<p>在异常捕获中（catch中参数），如果明确知道产生的是何种异常，可以用该异常类作为catch的参数；也可<br>以用其父类作为catch的参数。catch中的内容一般是：getMessage() 获取异常信息，返回字符串；<br>printStackTrace() 获取异常类名和异常信息，以及异常出现在程序中的位置。返回值void。</p>
+<p>eg1:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> review_Exception;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IndexOutExp</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String friends[]=&#123;<span class="string">&quot;sk&quot;</span>,<span class="string">&quot;jh&quot;</span>,<span class="string">&quot;lx&quot;</span>&#125;;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">                System.out.println(friends[i]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span>(ArrayIndexOutOfBoundsException e)&#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;index error&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;\nthis is end&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>eg2:</p>
+<p>​    </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> review_Exception;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DivideZero1</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> x;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        DivideZero1 dz = <span class="keyword">new</span> DivideZero1();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">int</span> y;</span><br><span class="line">            y = <span class="number">3</span> / dz.x;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span>(ArrayIndexOutOfBoundsException e1)&#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;has ArrayIndexOutOfBoundsException&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (ArithmeticException e2) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;divided by zero error!&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">finally</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;function end&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面用的都是运行时异常及其子类，即使没有用try和catch进行捕获，java也能自己捕获并且编译通过。</p>
+<p>当我们碰到的是编译时异常（eg：IOException）,则必须进行捕获操作，可以认为将之转化成了运行时异常，否则编译错误。</p>
+<p>eg:</p>
+<p>​    </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> review_Exception;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.FileNotFoundException;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IOExp</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">            FileInputStream in = <span class="keyword">new</span> FileInputStream(<span class="string">&quot;skatguigu.txt&quot;</span>);</span><br><span class="line">            <span class="keyword">int</span> b;</span><br><span class="line">            b = in.read();</span><br><span class="line">            <span class="keyword">while</span> (b != -<span class="number">1</span>)&#123;</span><br><span class="line">                System.out.println((<span class="keyword">char</span>)b);</span><br><span class="line">                b = in.read();</span><br><span class="line">            &#125;</span><br><span class="line">            in.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">finally</span>&#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;it is ok!&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>方式二：throws(声明抛出异常)</p>
+<ul>
+<li><p>如果一个生成了异常，但是不确定怎么处理，此方法应显示的声明抛出异常，表示此方法不处理，而是由该方法的调用者进行处理。</p>
+<p>​    throws语句后接声明抛出的异常的列表，同样的也可以是该异常的父类。</p>
+</li>
+</ul>
+<p>eg:</p>
+<p>​    </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> review_Exception;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThrowsTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ThrowsTest t = <span class="keyword">new</span> ThrowsTest();</span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">            t.readFile();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">readFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        FileInputStream in = <span class="keyword">new</span> FileInputStream(<span class="string">&quot;skatguigu.txt&quot;</span>);</span><br><span class="line">        <span class="keyword">int</span> b;</span><br><span class="line">        b = in.read();</span><br><span class="line">        <span class="keyword">while</span>(b != -<span class="number">1</span>)&#123;</span><br><span class="line">            System.out.println((<span class="keyword">char</span>)b);</span><br><span class="line">            b = in.read();</span><br><span class="line">        &#125;</span><br><span class="line">        in.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>**注：重写方法不能抛出比被重写方法范围更大的异常类型。在多态的情况下，<br>对methodA()方法的调用-异常的捕获按父类声明的异常处理！</p>
+<p>public class A {<br>public void methodA() throws IOException {<br>……<br>} }<br>public class B1 extends A {<br>public void methodA() throws FileNotFoundException {<br>……<br>} }<br>public class B2 extends A {<br>public void methodA() throws Exception { // 报错<br>……<br>} }</p>
+<p>注： Java异常类对象除在程序执行过程中出现异常时由系统自动生成并<br>抛出，也可根据需要 使用人工创建并抛出 。<br>步骤：首先要生成异常类对象，然后通过throw语句实现抛出操作(提交给Java运<br>行环境)。<br>IOException e = new IOException();<br>throw e;<br>可以抛出的异常必须是Throwable或其子类的实例。下面的语句在编译时将<br>会产生语法错误：</p>
+<p>throw new String(“want to throw”);</p>
+</li>
+<li><p>方式三：throw(用户自定义异常)</p>
+<ol>
+<li><p>一般地，用户自定义异常类都是RuntimeException的子类。</p>
+</li>
+<li><p>自定义异常类通常需要编写几个重载的构造器，必须继承现有的异常类。</p>
+</li>
+<li><p>自定义异常需要提供serialVersionUID。</p>
+</li>
+<li><p>自定义的异常通过throw抛出。</p>
+</li>
+<li><p>自定义异常最重要的是异常类的名字，当异常出现时，可以根据<br>名字判断异常类型。</p>
+<p>eg:</p>
+<p>​    </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> review_Exception;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyException</span> <span class="keyword">extends</span> <span class="title">Exception</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">13465653435L</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> idnumber;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myException</span><span class="params">(String message, <span class="keyword">int</span> id)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(message);</span><br><span class="line">        <span class="keyword">this</span>.idnumber = id;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getId</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> idnumber;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> review_Exception;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyExpTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">regist</span><span class="params">(<span class="keyword">int</span> num)</span> <span class="keyword">throws</span> MyException</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(num &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MyException(<span class="string">&quot;人數為複數，不合理&quot;</span>, <span class="number">3</span>);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            System.out.println(<span class="string">&quot;登記人數&quot;</span> + num);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">manager</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            regist(<span class="number">100</span>);</span><br><span class="line">        &#125;<span class="keyword">catch</span> (myException e)&#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;登記失敗，出錯類型&quot;</span> + e.getId());</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;本次登記操作結束&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        MyExpTest t = <span class="keyword">new</span> MyExpTest();</span><br><span class="line">        t.manager();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article id="post-hello-world" class="h-entry post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time class="dt-published" datetime="2021-08-31T12:38:38.144Z"><a href="/2021/08/31/hello-world/">2021-08-31</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2021/08/31/hello-world/">Hello World</a></h1>
+  
+
+    </header>
+    <div class="e-content entry" itemprop="articleBody">
+      
+        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+
+      
+    </div>
+    <footer>
+      
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+<nav id="pagination">
+  
+  
+  <div class="clearfix"></div>
+</nav></div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Search">
+    <input type="hidden" name="as_sitesearch" value="example.com">
+  </form>
+</div>
+
+
+  
+
+  
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2021 John Doe
+  
+</div>
+<div class="clearfix"></div></footer>
+  
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+
+
+<script src="/js/gallery.js"></script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+<script>
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+</body>
+</html>
